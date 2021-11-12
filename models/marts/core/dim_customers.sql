@@ -6,23 +6,15 @@ orders as (
     select * from {{ ref('stg_orders')}}
 ),
 
-lifetime_value as (
-    select sum(amount) as lifetime_value, customer_id
-    from {{ref('fct_orders')}}
-    group by customer_id
-),
-
-customer_orders as (
-
-    select
+customer_orders as (select
         customer_id,
 
         min(order_date) as first_order_date,
         max(order_date) as most_recent_order_date,
-        count(order_id) as number_of_orders
+        count(order_id) as number_of_orders,
+        sum(amount) as lifetime_value
 
-    from orders
-
+    from {{ref('fct_orders')}}
     group by 1
 
 ),
@@ -37,13 +29,11 @@ final as (
         customer_orders.first_order_date,
         customer_orders.most_recent_order_date,
         coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
-        coalesce(lifetime_value, 0) as lifetime_value
+        coalesce(customer_orders.lifetime_value, 0) as lifetime_value
 
     from customers
 
     left join customer_orders using (customer_id)
-    left join lifetime_value using (customer_id)
-
 )
 
 select * from final
