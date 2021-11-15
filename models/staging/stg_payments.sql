@@ -5,6 +5,6 @@ select
     paymentmethod as payment_method,
     status,
     created as date
-from stripe.payment
+from {{ source('stripe', 'payment') }}
 
 -- amount in cents
