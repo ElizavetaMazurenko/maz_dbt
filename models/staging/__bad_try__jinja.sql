@@ -1,3 +1,6 @@
+{% set payment_methods = dbt_utils.get_column_values(table=ref('stg_payments'), column='payment_method') %}
+{% set statuses = dbt_utils.get_column_values(table=ref('stg_payments'), column='status') %}
+
 -- {%- set payment_methods = ['bank_transfer', 'credit_card', 'coupon', 'gift_card'] -%}
 
 -- with payments as (
